@@ -1,0 +1,52 @@
+plugins {
+    id 'org.springframework.boot' version '2.2.1.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'java'
+}
+ext {
+
+    mapstructVersion = "1.2.0.Final"
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'mysql:mysql-connector-java'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+
+        compile "org.mapstruct:mapstruct-jdk8:$mapstructVersion"
+
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        runtimeOnly 'mysql:mysql-connector-java'
+        compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.13'
+
+
+        compileOnly "org.mapstruct:mapstruct-processor:$mapstructVersion"
+        annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+
+        testCompileClasspath "org.mapstruct:mapstruct-processor:$mapstructVersion"
+    }
+
+
+}
+
+test {
+    useJUnitPlatform()
+}
