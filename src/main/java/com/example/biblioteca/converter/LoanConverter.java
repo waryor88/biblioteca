@@ -8,6 +8,7 @@ import org.mapstruct.Mapper;
 public interface LoanConverter {
 
   LoanDto toDto(Loan loan);
+
   Loan toEntity(LoanDto loanDto);
 
 }

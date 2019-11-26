@@ -1,10 +1,10 @@
 package com.example.biblioteca.model;
 
-import java.time.Instant;
-import javax.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,9 +15,13 @@ public class BookDto {
 
   private String title;
 
-  private Instant year;
+  private Long year;
 
-  private String type;
+  private String inventoryNumber;
+
+  private String bookType;
+
+  private List<AuthorDto>authors;
 
 
 }

@@ -7,10 +7,9 @@ import com.example.biblioteca.repository.BookRepository;
 import com.example.biblioteca.service.BookService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,6 +27,17 @@ public class BookController {
     bookDto.setExternalId(UUID.randomUUID().toString());
     Book book=bookConverter.toEntity(bookDto);
     bookRepository.save(book);
+  }
+
+  @GetMapping
+  private Page<BookDto> getBooks(Pageable pageable) {
+    return bookService.getBook(pageable);
+  }
+
+  @GetMapping("/search")
+  public Page<BookDto> search(@RequestParam(name = "criteria", required = false) String criteria,
+                                @RequestParam(name = "query", required = false) String query, Pageable pageable) {
+    return bookService.search(criteria, query, pageable);
   }
 
 }

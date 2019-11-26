@@ -18,9 +18,13 @@ public class BookLoan {
   @Generated
   private Long id;
 
+  private String inventoryNumber;
+
   @ManyToOne
   private Book book;
 
   @ManyToOne
   private Loan loan;
+
+  private Boolean available;
 }

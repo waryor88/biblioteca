@@ -22,4 +22,6 @@ public class Loan {
   private Instant loanDate;
 
   private Instant returnDate;
+
+  
 }

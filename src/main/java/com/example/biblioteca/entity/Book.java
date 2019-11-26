@@ -2,11 +2,9 @@ package com.example.biblioteca.entity;
 
 
 import java.time.Instant;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import java.util.Set;
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Generated;
@@ -25,9 +23,10 @@ public class Book {
 
   private String title;
 
-  private Instant year;
+  private Long year;
 
-  private String type;
+  private String inventoryNumber;
 
+  private String bookType;
 
 }

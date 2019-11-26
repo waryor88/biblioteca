@@ -38,6 +38,7 @@ dependencies {
         compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.13'
 
 
+
         compileOnly "org.mapstruct:mapstruct-processor:$mapstructVersion"
         annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
 

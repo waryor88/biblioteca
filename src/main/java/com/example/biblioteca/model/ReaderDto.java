@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,5 +24,7 @@ public class ReaderDto {
   private String address;
 
   private String email;
+
+  private List<BookDto>loanBooks;
 
 }
