@@ -7,12 +7,11 @@ import com.example.biblioteca.service.AuthorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/author")
@@ -28,8 +27,16 @@ public class AuthorController {
   }
 
   @GetMapping
-  private Page<AuthorDto>getAuthors(Pageable pageable)
+  private List<AuthorDto> getAuthors(Pageable pageable)
   {
    return authorService.getAuthors(pageable);
   }
+
+@GetMapping("/{externalId}")
+  private AuthorDto getAuthorByExternalId(@PathVariable("externalId")String externalId)
+{
+  return authorService.findByExternalId(externalId);
 }
+
+}
+

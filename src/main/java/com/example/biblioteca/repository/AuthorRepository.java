@@ -8,10 +8,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AuthorRepository extends PagingAndSortingRepository<Author,Long>{
 
-
+Optional<Author>findByExternalId(String externalId);
 
 }
