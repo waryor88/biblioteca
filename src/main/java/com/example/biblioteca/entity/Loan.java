@@ -2,6 +2,7 @@ package com.example.biblioteca.entity;
 
 import java.time.Instant;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class Loan {
   @Id
-  @Generated
+  @GeneratedValue
   private Long id;
 
   private String externalId;
@@ -22,6 +23,8 @@ public class Loan {
   private Instant loanDate;
 
   private Instant returnDate;
+
+  private String readerExternalId;
 
   
 }

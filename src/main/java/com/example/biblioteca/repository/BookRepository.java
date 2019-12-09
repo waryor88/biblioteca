@@ -8,6 +8,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface BookRepository extends PagingAndSortingRepository<Book,Long> {
     Page<Book>findAll(Pageable pageable);
@@ -19,4 +21,6 @@ public interface BookRepository extends PagingAndSortingRepository<Book,Long> {
     Page<Book> search(@Param("title") String title,
                         @Param("bookType") String bookType,
                         Pageable pageable);
+
+    Optional<Book> findByExternalId(String externalId);
 }

@@ -23,5 +23,7 @@ public class BookDto {
 
   private List<AuthorDto>authors;
 
+  private Boolean available;
+
 
 }

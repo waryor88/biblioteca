@@ -1,8 +1,6 @@
 package com.example.biblioteca.model;
 
-import com.example.biblioteca.entity.Book;
 import java.util.List;
-import javax.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

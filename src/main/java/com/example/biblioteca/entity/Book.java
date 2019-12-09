@@ -29,4 +29,6 @@ public class Book {
 
   private String bookType;
 
+  private Boolean available;
+
 }

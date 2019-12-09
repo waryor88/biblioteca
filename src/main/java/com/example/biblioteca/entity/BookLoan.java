@@ -1,8 +1,7 @@
 package com.example.biblioteca.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Generated;
@@ -15,16 +14,16 @@ import lombok.NoArgsConstructor;
 public class BookLoan {
 
   @Id
-  @Generated
+  @GeneratedValue
   private Long id;
 
   private String inventoryNumber;
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.ALL)
   private Book book;
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.ALL)
   private Loan loan;
 
-  private Boolean available;
+
 }

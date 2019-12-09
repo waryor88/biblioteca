@@ -24,9 +24,7 @@ public class BookController {
   @PostMapping
   private void addBook(@RequestBody BookDto bookDto)
   {
-    bookDto.setExternalId(UUID.randomUUID().toString());
-    Book book=bookConverter.toEntity(bookDto);
-    bookRepository.save(book);
+   bookService.addBook(bookDto);
   }
 
   @GetMapping
