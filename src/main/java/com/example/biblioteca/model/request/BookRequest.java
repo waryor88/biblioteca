@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class BookRequest {
     private String externalId;
 
-    private String inventoryNumber;
 }

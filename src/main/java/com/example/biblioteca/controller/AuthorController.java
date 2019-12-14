@@ -19,21 +19,19 @@ public class AuthorController {
 
   private final AuthorService authorService;
 
-  private final AuthorConverter authorConverter;
-
   @PostMapping
-  private AuthorDto addAuthor(@RequestBody AuthorDto authorDto) {
+  public AuthorDto addAuthor(@RequestBody AuthorDto authorDto) {
     return authorService.addAuthor(authorDto);
   }
 
   @GetMapping
-  private List<AuthorDto> getAuthors(Pageable pageable)
+  public List<AuthorDto> getAuthors(Pageable pageable)
   {
    return authorService.getAuthors(pageable);
   }
 
 @GetMapping("/{externalId}")
-  private AuthorDto getAuthorByExternalId(@PathVariable("externalId")String externalId)
+  public AuthorDto getAuthorByExternalId(@PathVariable("externalId")String externalId)
 {
   return authorService.findByExternalId(externalId);
 }

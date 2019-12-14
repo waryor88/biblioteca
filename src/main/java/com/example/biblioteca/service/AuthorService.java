@@ -25,53 +25,52 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthorService {
 
-    private final AuthorConverter authorConverter;
+  private final AuthorConverter authorConverter;
 
-    private final AuthorRepository authorRepository;
+  private final AuthorRepository authorRepository;
 
-    private final BookRepository bookRepository;
+  private final BookRepository bookRepository;
 
-    private final BookConverter bookConverter;
+  private final BookConverter bookConverter;
 
-    private final BookAuthorRepository bookAuthorRepository;
+  private final BookAuthorRepository bookAuthorRepository;
 
-    public AuthorDto addAuthor(AuthorDto authorDto) {
-        authorDto.setExternalId(UUID.randomUUID().toString());
-        Author author = authorConverter.toEntity(authorDto);
-        authorRepository.save(author);
-        return authorDto;
+  public AuthorDto addAuthor(AuthorDto authorDto) {
+    authorDto.setExternalId(UUID.randomUUID().toString());
+    Author author = authorConverter.toEntity(authorDto);
+    authorRepository.save(author);
+    return authorDto;
+  }
+
+  public List<AuthorDto> getAuthors(Pageable pageable) {
+    List<AuthorDto> authorDtos = new ArrayList<>();
+    Page<AuthorDto> authorDtoPage = authorRepository.findAll(pageable).map(this::fetchMapping);
+    for (AuthorDto authorDto : authorDtoPage) {
+      authorDtos.add(authorDto);
     }
+    return authorDtos;
+  }
 
-    public List<AuthorDto> getAuthors(Pageable pageable) {
-        List<AuthorDto>authorDtos=new ArrayList<>();
-        Page<AuthorDto>authorDtoPage= authorRepository.findAll(pageable).map(this::fetchMapping);
-        for(AuthorDto authorDto:authorDtoPage)
-        {
-            authorDtos.add(authorDto);
-        }
-        return authorDtos;
+  public AuthorDto findByExternalId(String externalId) {
+    Author author = authorRepository.findByExternalId(externalId).orElseThrow(
+        () -> new MicroserviceException(HttpStatus.NOT_FOUND,
+            "cannot find author with external id" + externalId));
+    AuthorDto authorDto = fetchMapping(author);
+    return authorDto;
+  }
+
+
+  private AuthorDto fetchMapping(Author author) {
+    final List<BookDto> bookDtos = new ArrayList<>();
+    final Iterable<Long> bookIds = bookAuthorRepository.findBookIdByAuthor(author.getId());
+    final AuthorDto authorDto = authorConverter.toDto(author);
+    for (Long bookId : bookIds) {
+      Book book = bookRepository.findById(bookId)
+          .orElseThrow(() -> new MicroserviceException(HttpStatus.NOT_FOUND, "canno find book"));
+      BookDto bookDto = bookConverter.toDto(book);
+      bookDtos.add(bookDto);
+      authorDto.setBooks(bookDtos);
     }
-
-    public AuthorDto findByExternalId(String externalId)
-    {
-        Author author=authorRepository.findByExternalId(externalId).orElseThrow(()->new MicroserviceException(HttpStatus.NOT_FOUND,"cannot find author with external id"+externalId));
-        AuthorDto authorDto=fetchMapping(author);
-        return authorDto;
-    }
-
-
-
-    private AuthorDto fetchMapping(Author author) {
-        final List<BookDto> bookDtos = new ArrayList<>();
-        final Iterable<Long> bookIds = bookAuthorRepository.findBookIdByAuthor(author.getId());
-        final AuthorDto authorDto = authorConverter.toDto(author);
-        for (Long bookId : bookIds) {
-            Book book = bookRepository.findById(bookId).orElseThrow(()->new MicroserviceException(HttpStatus.NOT_FOUND,"canno find book"));
-            BookDto bookDto = bookConverter.toDto(book);
-            bookDtos.add(bookDto);
-            authorDto.setBooks(bookDtos);
-        }
-        return authorDto;
-    }
-
+    return authorDto;
+  }
 }

@@ -14,10 +14,12 @@ import lombok.NoArgsConstructor;
 public class BookLoan {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  private String inventoryNumber;
+  private Boolean available;
+
+  private Long inventoryNumber;
 
   @ManyToOne(cascade = CascadeType.ALL)
   private Book book;

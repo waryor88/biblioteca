@@ -15,15 +15,12 @@ public class BookDto {
 
   private String title;
 
-  private Long year;
-
-  private String inventoryNumber;
+  private Integer year;
 
   private String bookType;
 
   private List<AuthorDto>authors;
 
-  private Boolean available;
 
 
 }

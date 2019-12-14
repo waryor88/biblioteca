@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class BookAuthor {
 
   @Id
-  @Generated
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
   @ManyToOne(cascade=CascadeType.ALL)

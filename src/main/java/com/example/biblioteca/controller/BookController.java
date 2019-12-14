@@ -15,20 +15,17 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/book")
 public class BookController {
+
   private final BookService bookService;
 
-  private final BookConverter bookConverter;
-
-  private final BookRepository bookRepository;
-
   @PostMapping
-  private void addBook(@RequestBody BookDto bookDto)
+  public void addBook(@RequestBody BookDto bookDto)
   {
    bookService.addBook(bookDto);
   }
 
   @GetMapping
-  private Page<BookDto> getBooks(Pageable pageable) {
+  public Page<BookDto> getBooks(Pageable pageable) {
     return bookService.getBook(pageable);
   }
 

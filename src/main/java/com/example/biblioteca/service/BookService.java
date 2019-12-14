@@ -3,12 +3,15 @@ package com.example.biblioteca.service;
 import com.example.biblioteca.converter.AuthorConverter;
 import com.example.biblioteca.converter.BookConverter;
 import com.example.biblioteca.entity.Book;
+import com.example.biblioteca.entity.BookLoan;
 import com.example.biblioteca.model.AuthorDto;
 import com.example.biblioteca.model.BookDto;
 import com.example.biblioteca.repository.AuthorRepository;
 import com.example.biblioteca.repository.BookAuthorRepository;
+import com.example.biblioteca.repository.BookLoanRepository;
 import com.example.biblioteca.repository.BookRepository;
 import com.exception.MicroserviceException;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.var;
 import org.springframework.data.domain.Page;
@@ -28,20 +31,26 @@ public class BookService {
 
   private final AuthorRepository authorRepository;
 
+  private final BookLoanRepository bookLoanRepository;
+
   private final BookAuthorRepository bookAuthorRepository;
 
   private final AuthorConverter authorConverter;
 
   private final BookConverter bookConverter;
 
-  public void addBook(BookDto bookDto) {
+  public BookDto addBook(BookDto bookDto) {
     bookDto.setExternalId(UUID.randomUUID().toString());
     Book book = bookConverter.toEntity(bookDto);
-    book.setAvailable(true);
+    BookLoan bookLoan=new BookLoan();
+    Random invNumber=new Random();
+    bookLoan.setInventoryNumber((long) invNumber.nextInt(123123));
+    bookLoan.setAvailable(true);
+    bookLoan.setBook(book);
     bookRepository.save(book);
+    bookLoanRepository.save(bookLoan);
+    return bookDto;
   }
-
-
 
   public Page<BookDto> getBook(Pageable pageable) {
     return bookRepository.findAll(pageable).map(this::getAuthors);
@@ -66,8 +75,9 @@ public class BookService {
   }
 
   public Page<BookDto> search(String criteria, String query, Pageable pageable) {
-    if (criteria.isEmpty() || query.isEmpty())
+    if (criteria.isEmpty() || query.isEmpty()) {
       return bookRepository.findAll(pageable).map(bookConverter::toDto);
+    }
     query = query.toLowerCase();
     final var searchFields = criteria.split(",");
     String title = null, bookType = null;

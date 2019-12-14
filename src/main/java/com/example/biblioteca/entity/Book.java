@@ -23,12 +23,9 @@ public class Book {
 
   private String title;
 
-  private Long year;
-
-  private String inventoryNumber;
+  private Integer year;
 
   private String bookType;
 
-  private Boolean available;
 
 }

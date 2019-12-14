@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/loan")
 public class LoanController {
+
     private final LoanService loanService;
 
     @PostMapping
-    private void addLoan(@RequestBody LoanDto loanDto)
+    public void addLoan(@RequestBody LoanDto loanDto)
     {
         loanService.addLoan(loanDto);
     }
