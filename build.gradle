@@ -29,19 +29,21 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-             
         compile "org.mapstruct:mapstruct-jdk8:$mapstructVersion"
-
         implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
         implementation 'org.springframework.boot:spring-boot-starter-web'
         runtimeOnly 'mysql:mysql-connector-java'
-        compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.13'
+        compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.18'
+        compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.2.2.RELEASE'
+        compile 'io.jsonwebtoken:jjwt:0.9.1'
+        compile group: 'org.springframework.security', name: 'spring-security-oauth2-client'
+        compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.2'
+        compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+        compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2'
 
-        compile 'mysql:mysql-connector-java:5.1.44'
 
         compileOnly "org.mapstruct:mapstruct-processor:$mapstructVersion"
         annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
-
         testCompileClasspath "org.mapstruct:mapstruct-processor:$mapstructVersion"
     }
 
