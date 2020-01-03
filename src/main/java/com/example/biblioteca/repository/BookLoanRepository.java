@@ -11,4 +11,7 @@ public interface BookLoanRepository extends PagingAndSortingRepository<BookLoan,
 
   List<BookLoan>findBookLoansByBook_ExternalId(String bookId);
 
+
+
+
 }

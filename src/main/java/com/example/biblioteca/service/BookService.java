@@ -11,7 +11,6 @@ import com.example.biblioteca.repository.BookAuthorRepository;
 import com.example.biblioteca.repository.BookLoanRepository;
 import com.example.biblioteca.repository.BookRepository;
 import com.exception.MicroserviceException;
-import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.var;
 import org.springframework.data.domain.Page;
@@ -21,7 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,8 +43,8 @@ public class BookService {
   public BookDto addBook(BookDto bookDto) {
     bookDto.setExternalId(UUID.randomUUID().toString());
     Book book = bookConverter.toEntity(bookDto);
-    BookLoan bookLoan=new BookLoan();
-    Random invNumber=new Random();
+    BookLoan bookLoan = new BookLoan();
+    Random invNumber = new Random();
     bookLoan.setInventoryNumber((long) invNumber.nextInt(123123));
     bookLoan.setAvailable(true);
     bookLoan.setBook(book);
@@ -52,8 +53,13 @@ public class BookService {
     return bookDto;
   }
 
-  public Page<BookDto> getBook(Pageable pageable) {
-    return bookRepository.findAll(pageable).map(this::getAuthors);
+  public List<BookDto> getBook(Pageable pageable) {
+    List<BookDto> bookDtos = new ArrayList<>();
+    Page<BookDto> bookDtoPage = bookRepository.findAll(pageable).map(this::getAuthors);
+    for (BookDto bookDto : bookDtoPage) {
+      bookDtos.add(bookDto);
+    }
+    return bookDtos;
   }
 
   private BookDto getAuthors(Book book) {
@@ -68,29 +74,42 @@ public class BookService {
               .orElseThrow(
                   () -> new MicroserviceException(HttpStatus.NOT_FOUND, "cannot find author"));
       authors.add(authorDto);
-      bookDto.setAuthors(authors);
-    }
 
+  }
+    bookDto.setAuthors(authors);
     return bookDto;
   }
 
-  public Page<BookDto> search(String criteria, String query, Pageable pageable) {
+  public List<BookDto> search(String criteria, String query, Pageable pageable) {
+      final List<BookDto>books=new ArrayList<>();
     if (criteria.isEmpty() || query.isEmpty()) {
-      return bookRepository.findAll(pageable).map(bookConverter::toDto);
+      return getBook(pageable);
     }
     query = query.toLowerCase();
     final var searchFields = criteria.split(",");
-    String title = null, bookType = null;
+    String title = null, bookType = null,author=null,year=null;
+
     for (var field : searchFields) {
       switch (field) {
         case "title":
           title = query;
           break;
+          case "author":
+              author = query;
+              break;
+          case "year":
+              year = query;
+              break;
         case "bookType":
           bookType = query;
           break;
       }
     }
-    return bookRepository.search(title, bookType, pageable).map(bookConverter::toDto);
+    Page<BookDto>bookDtoPage= bookRepository.search(title, bookType,author,year, pageable).map(this::getAuthors);
+    for(BookDto bookDto :bookDtoPage)
+    {
+        books.add(bookDto);
+    }
+    return books;
   }
 }

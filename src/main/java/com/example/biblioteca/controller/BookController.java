@@ -5,6 +5,8 @@ import com.example.biblioteca.entity.Book;
 import com.example.biblioteca.model.BookDto;
 import com.example.biblioteca.repository.BookRepository;
 import com.example.biblioteca.service.BookService;
+
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,12 +27,12 @@ public class BookController {
   }
 
   @GetMapping
-  public Page<BookDto> getBooks(Pageable pageable) {
+  public List<BookDto> getBooks(Pageable pageable) {
     return bookService.getBook(pageable);
   }
 
   @GetMapping("/search")
-  public Page<BookDto> search(@RequestParam(name = "criteria", required = false) String criteria,
+  public List<BookDto> search(@RequestParam(name = "criteria", required = false) String criteria,
                                 @RequestParam(name = "query", required = false) String query, Pageable pageable) {
     return bookService.search(criteria, query, pageable);
   }
