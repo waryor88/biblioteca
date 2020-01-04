@@ -15,7 +15,7 @@ public class Users {
 
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
   private String userName;
@@ -23,6 +23,8 @@ public class Users {
   private String password;
 
   private String externalId;
+
+  private Boolean isAdmin;
 
   @OneToOne
   Reader reader;
