@@ -16,13 +16,15 @@ public interface BookRepository extends PagingAndSortingRepository<Book, Long> {
   Page<Book> findAll(Pageable pageable);
 
   @Query(
-      "SELECT DISTINCT b from Book b "
+                      "SELECT DISTINCT b from Book b "
           + "inner join BookAuthor ba on b.id=ba.book.id "
           + "inner join Author a on ba.author.id=a.id "
           + "WHERE "
           + "(:title IS NOT NULL AND lower(b.title) LIKE %:title%) OR "
-          + "(:bookType IS NOT NULL AND lower(b.bookType) LIKE %:bookType%) OR"
-          + " (lower(CONCAT(a.fname,' ',a.lname)) LIKE lower(:author))"
+          + "(:bookType IS NOT NULL AND lower(b.bookType) LIKE %:bookType%) OR "
+          + "(trim(lower(CONCAT(a.fname,' ',a.lname))) LIKE trim(lower(:author))) " +
+                              "OR lower(a.fname) LIKE %:author% " +
+                              "OR lower(a.lname) LIKE %:author% "
           + "OR (concat('',b.year)=:year)")
   Page<Book> search(
       @Param("title") String title,

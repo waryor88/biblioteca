@@ -1,15 +1,11 @@
 package com.example.biblioteca.controller;
 
-import com.example.biblioteca.converter.BookConverter;
-import com.example.biblioteca.entity.Book;
+
 import com.example.biblioteca.model.BookDto;
-import com.example.biblioteca.repository.BookRepository;
 import com.example.biblioteca.service.BookService;
 
 import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 @CrossOrigin
