@@ -18,11 +18,10 @@ public class ReaderService {
 
   private final ReaderConverter readerConverter;
 
-  public ReaderDto addReader(ReaderDto readerDto) {
+  public void addReader(ReaderDto readerDto) {
     readerDto.setExternalId(UUID.randomUUID().toString());
     Reader reader = readerConverter.toEntity(readerDto);
     readerRepository.save(reader);
-    return readerDto;
   }
 
   public ReaderDto findByExternalId(String externalId) {

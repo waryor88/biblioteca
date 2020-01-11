@@ -43,4 +43,15 @@ public interface BookRepository extends PagingAndSortingRepository<Book, Long> {
                   " WHERE lo.reader_external_id=:readerId",
       nativeQuery = true)
   List<Book> findBooksByReader(@Param("readerId") String readerId);
+
+  @Query(
+      value =
+          "SELECT DISTINCT  b.id,b.external_id,b.title,b.year,b.book_type FROM book b"
+              + " inner join book_loan bl on bl.book_id=b.id"
+              + " inner join loan lo on bl.loan_id=lo.id" +
+                  " WHERE bl.loan_id=:loanId",
+      nativeQuery = true)
+  List<Book> findBookByLoanId(@Param("loanId") Long loanId);
+
+  Optional<Book>getBookByExternalId(String externalId);
 }

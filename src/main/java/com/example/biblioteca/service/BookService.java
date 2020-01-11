@@ -2,14 +2,13 @@ package com.example.biblioteca.service;
 
 import com.example.biblioteca.converter.AuthorConverter;
 import com.example.biblioteca.converter.BookConverter;
+import com.example.biblioteca.converter.LoanConverter;
 import com.example.biblioteca.entity.Book;
 import com.example.biblioteca.entity.BookLoan;
+import com.example.biblioteca.entity.Loan;
 import com.example.biblioteca.model.AuthorDto;
 import com.example.biblioteca.model.BookDto;
-import com.example.biblioteca.repository.AuthorRepository;
-import com.example.biblioteca.repository.BookAuthorRepository;
-import com.example.biblioteca.repository.BookLoanRepository;
-import com.example.biblioteca.repository.BookRepository;
+import com.example.biblioteca.repository.*;
 import com.exception.MicroserviceException;
 import lombok.RequiredArgsConstructor;
 import lombok.var;
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +29,8 @@ public class BookService {
   private final BookRepository bookRepository;
 
   private final AuthorRepository authorRepository;
+
+  private final LoanRepository loanRepository;
 
   private final BookLoanRepository bookLoanRepository;
 
@@ -53,13 +53,59 @@ public class BookService {
     return bookDto;
   }
 
+  public BookDto getBookByExternalId(String externalId) {
+    Book book =
+        bookRepository
+            .findByExternalId(externalId)
+            .orElseThrow(
+                () ->
+                    new MicroserviceException(
+                        HttpStatus.NOT_FOUND, "cannot find book by id " + externalId));
+    BookDto bookDto = getAuthors(book);
+    return bookDto;
+  }
+
+  public BookDto getBookByLoanExternalId(String loanExternalId) {
+  BookDto bookDto=new BookDto();
+    Loan loan =
+        loanRepository
+            .findLoanByExternalId(loanExternalId)
+            .orElseThrow(
+                () ->
+                    new MicroserviceException(
+                        HttpStatus.NOT_FOUND, "cannot find loan by id " + loanExternalId));
+    List<Book>books=bookRepository.findBookByLoanId(loan.getId());
+    for(Book book:books)
+    {
+     bookDto=getAuthors(book);
+
+    }
+    return bookDto;
+  }
+
   public List<BookDto> getBook(Pageable pageable) {
     List<BookDto> bookDtos = new ArrayList<>();
     Page<BookDto> bookDtoPage = bookRepository.findAll(pageable).map(this::getAuthors);
     for (BookDto bookDto : bookDtoPage) {
+      String externalId=bookDto.getExternalId();
+      if(checkAvailable(externalId)==true)
       bookDtos.add(bookDto);
     }
     return bookDtos;
+  }
+
+  private Boolean checkAvailable(String externalId)
+  {
+    BookLoan bookLoan=new BookLoan();
+    var bookLoans=bookLoanRepository.findBookLoansByBook_ExternalId(externalId);
+    for(BookLoan bloan:bookLoans)
+    {
+      bookLoan=bloan;
+    }
+    if (bookLoan.getAvailable()==true)
+      return true;
+    else
+      return false;
   }
 
   private BookDto getAuthors(Book book) {
@@ -74,42 +120,42 @@ public class BookService {
               .orElseThrow(
                   () -> new MicroserviceException(HttpStatus.NOT_FOUND, "cannot find author"));
       authors.add(authorDto);
-
-  }
+    }
     bookDto.setAuthors(authors);
     return bookDto;
   }
 
   public List<BookDto> search(String criteria, String query, Pageable pageable) {
-      final List<BookDto>books=new ArrayList<>();
+    final List<BookDto> books = new ArrayList<>();
     if (criteria.isEmpty() || query.isEmpty()) {
       return getBook(pageable);
     }
     query = query.toLowerCase();
     final var searchFields = criteria.split(",");
-    String title = null, bookType = null,author=null,year=null;
+    String title = null, bookType = null, author = null, year = null;
 
     for (var field : searchFields) {
       switch (field) {
         case "title":
           title = query;
           break;
-          case "author":
-              author = query;
-              break;
-          case "year":
-              year = query;
-              break;
+        case "author":
+          author = query;
+          break;
+        case "year":
+          year = query;
+          break;
         case "bookType":
           bookType = query;
           break;
       }
     }
-    Page<BookDto>bookDtoPage= bookRepository.search(title, bookType,author,year, pageable).map(this::getAuthors);
-    for(BookDto bookDto :bookDtoPage)
-    {
-        books.add(bookDto);
+    Page<BookDto> bookDtoPage =
+        bookRepository.search(title, bookType, author, year, pageable).map(this::getAuthors);
+    for (BookDto bookDto : bookDtoPage) {
+      books.add(bookDto);
     }
     return books;
   }
+
 }

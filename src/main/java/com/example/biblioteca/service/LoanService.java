@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,40 +44,29 @@ public class LoanService {
   private final BookLoanRepository bookLoanRepository;
 
   public String addLoan(LoanDto loanDto) {
-    var check = true;
-    String bookId = "UUID";
+
     var email = SecurityContextHolder.getContext().getAuthentication().getName();
     var reader = findReaderByEmail(email);
-    if (check) {
-      List<BookRequest> books = loanDto.getLoanBooks();
-      for (BookRequest bookRequest : books) {
-
-        String externalId = UUID.randomUUID().toString();
-        loanDto.setExternalId(externalId);
-        loanDto.setReaderExternalId(reader.getExternalId());
-        loanDto.setLoanDate(Instant.now());
-        Loan loan = loanConverter.toEntity(loanDto);
-        var bookLoans =
-            bookLoanRepository.findBookLoansByBook_ExternalId(bookRequest.getExternalId());
-        for (BookLoan bookLoan : bookLoans) {
-          if (bookLoan.getAvailable()) loanRepository.save(loan);
-          else check = false;
-          bookId = bookLoan.getBook().getExternalId();
-        }
-
-        for (BookLoan bookLoan : bookLoans) {
-          if (!bookLoan.getAvailable()) {
-            check = false;
-            bookId = bookLoan.getBook().getExternalId();
-          }
-          bookLoan.setLoan(loan);
-          bookLoan.setAvailable(false);
-          bookLoanRepository.save(bookLoan);
-        }
+    List<BookRequest> books = loanDto.getLoanBooks();
+    for (BookRequest bookRequest : books) {
+      String externalId = UUID.randomUUID().toString();
+      loanDto.setExternalId(externalId);
+      loanDto.setReaderExternalId(reader.getExternalId());
+      loanDto.setLoanDate(Instant.now());
+      loanDto.setReturnDate(Instant.now().plusMillis(604800000));
+      Loan loan = loanConverter.toEntity(loanDto);
+      var bookLoans =
+          bookLoanRepository.findBookLoansByBook_ExternalId(bookRequest.getExternalId());
+      for (BookLoan bookLoan : bookLoans) {
+        loanRepository.save(loan);
+      }
+      for (BookLoan bookLoan : bookLoans) {
+        bookLoan.setLoan(loan);
+        bookLoan.setAvailable(false);
+        bookLoanRepository.save(bookLoan);
       }
     }
-    if (!check) return "Book with id " + bookId + " is not available for loan.";
-    else return "Succesfully loaned";
+    return "Book succesfully loaned !";
   }
 
   public List<LoanResponse> getLoans() {
@@ -85,20 +75,28 @@ public class LoanService {
     var loans = loanRepository.findAllByReaderExternalId(reader.getExternalId());
     List<LoanResponse> loanResponses = new ArrayList<>();
     var books = bookRepository.findBooksByReader(reader.getExternalId());
-    List<BookDto> bookDtos = new ArrayList<>();
-
-    for (Book book : books) {
-      BookDto bookDto = bookConverter.toDto(book);
-      bookDtos.add(bookDto);
-    }
 
     for (Loan loan : loans) {
       LoanResponse loanResponse = loanConverter.toResponse(loan);
-      loanResponse.setLoanBooks(bookDtos);
+      for (Book book : books) {
+        List<BookDto> bookDtos =
+            getBooksByLoanId(loan.getId()).stream()
+                .map(this::bookConverter)
+                .collect(Collectors.toList());
+        loanResponse.setLoanBooks(bookDtos);
+      }
       loanResponses.add(loanResponse);
     }
 
     return loanResponses;
+  }
+
+  private BookDto bookConverter(Book book) {
+    return bookConverter.toDto(book);
+  }
+
+  private List<Book> getBooksByLoanId(Long loanId) {
+    return bookRepository.findBookByLoanId(loanId);
   }
 
   private Reader findReaderByEmail(String email) {

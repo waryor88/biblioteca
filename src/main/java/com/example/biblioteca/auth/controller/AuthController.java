@@ -8,6 +8,8 @@ import com.example.biblioteca.auth.model.LoginRequest;
 import com.example.biblioteca.auth.model.SignUpRequest;
 import com.example.biblioteca.auth.oauth2.TokenProvider;
 import com.example.biblioteca.auth.repository.UserRepository;
+import com.example.biblioteca.entity.Reader;
+import com.example.biblioteca.repository.ReaderRepository;
 import com.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.UUID;
 
 
 @RestController
@@ -41,6 +44,9 @@ public class AuthController {
 
     @Autowired
     private TokenProvider tokenProvider;
+
+    @Autowired
+    private ReaderRepository readerRepository;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -64,23 +70,28 @@ public class AuthController {
             throw new BadRequestException("Email address already in use.");
         }
 
-
-
+        Reader reader=new Reader();
+        reader.setExternalId(UUID.randomUUID().toString());
+        reader.setAddress(signUpRequest.getAddress());
+        reader.setEmail(signUpRequest.getEmail());
+        reader.setFname(signUpRequest.getFname());
+        reader.setLname(signUpRequest.getLname());
+        reader.setTel(signUpRequest.getTel());
+        readerRepository.save(reader);
 
         User user = new User();
-
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(signUpRequest.getPassword());
         user.setProvider(AuthProvider.local);
-
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
+        user.setReader(reader);
         User result = userRepository.save(user);
+
+
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/user/me")
                 .buildAndExpand(result.getId()).toUri();
-
         return ResponseEntity.created(location)
                 .body(new ApiResponse(true, "User registered successfully@"));
     }

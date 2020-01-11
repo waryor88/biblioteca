@@ -33,4 +33,15 @@ public class BookController {
     return bookService.search(criteria, query, pageable);
   }
 
+  @GetMapping("/{externalId}")
+  public BookDto getBookByExternalId(@PathVariable("externalId")String externalId)
+  {
+    return bookService.getBookByExternalId(externalId);
+  }
+
+  @GetMapping("/loan/{externalId}")
+  public BookDto getBookByLoanExternalId(@PathVariable("externalId")String externalId)
+  {
+    return bookService.getBookByLoanExternalId(externalId);
+  }
 }

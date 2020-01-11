@@ -1,4 +1,5 @@
 package com.example.biblioteca.auth.entity;
+import com.example.biblioteca.entity.Reader;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,5 +36,10 @@ public class User {
     private AuthProvider provider;
 
     private String providerId;
+
+    private Boolean isAdmin;
+
+    @OneToOne
+    Reader reader;
 
 }

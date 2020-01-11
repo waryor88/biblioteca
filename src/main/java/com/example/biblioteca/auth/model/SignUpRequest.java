@@ -17,4 +17,15 @@ public class SignUpRequest {
     @NotBlank
     private String password;
 
+    @NotBlank
+    private String fname;
+
+    @NotBlank
+    private String lname;
+
+    private String tel;
+
+    private String address;
+
+
 }

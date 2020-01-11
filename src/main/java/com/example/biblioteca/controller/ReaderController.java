@@ -1,9 +1,5 @@
 package com.example.biblioteca.controller;
 
-import com.example.biblioteca.converter.ReaderConverter;
-import com.example.biblioteca.entity.Reader;
-import com.example.biblioteca.model.AuthorDto;
-import com.example.biblioteca.model.BookDto;
 import com.example.biblioteca.model.ReaderDto;
 import com.example.biblioteca.service.ReaderService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +19,7 @@ public class ReaderController {
 
   private final ReaderService readerService;
 
-  @PostMapping
+  @PostMapping("/register")
   public void addReader(@RequestBody ReaderDto readerDto)
   {
     readerService.addReader(readerDto);
