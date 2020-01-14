@@ -2,7 +2,6 @@ package com.example.biblioteca.service;
 
 import com.example.biblioteca.converter.AuthorConverter;
 import com.example.biblioteca.converter.BookConverter;
-import com.example.biblioteca.converter.LoanConverter;
 import com.example.biblioteca.entity.Book;
 import com.example.biblioteca.entity.BookLoan;
 import com.example.biblioteca.entity.Loan;
@@ -17,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -24,6 +24,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookService {
 
   private final BookRepository bookRepository;
@@ -66,7 +67,7 @@ public class BookService {
   }
 
   public BookDto getBookByLoanExternalId(String loanExternalId) {
-  BookDto bookDto=new BookDto();
+    BookDto bookDto = new BookDto();
     Loan loan =
         loanRepository
             .findLoanByExternalId(loanExternalId)
@@ -74,11 +75,9 @@ public class BookService {
                 () ->
                     new MicroserviceException(
                         HttpStatus.NOT_FOUND, "cannot find loan by id " + loanExternalId));
-    List<Book>books=bookRepository.findBookByLoanId(loan.getId());
-    for(Book book:books)
-    {
-     bookDto=getAuthors(book);
-
+    List<Book> books = bookRepository.findBookByLoanId(loan.getId());
+    for (Book book : books) {
+      bookDto = getAuthors(book);
     }
     return bookDto;
   }
@@ -87,25 +86,20 @@ public class BookService {
     List<BookDto> bookDtos = new ArrayList<>();
     Page<BookDto> bookDtoPage = bookRepository.findAll(pageable).map(this::getAuthors);
     for (BookDto bookDto : bookDtoPage) {
-      String externalId=bookDto.getExternalId();
-      if(checkAvailable(externalId)==true)
-      bookDtos.add(bookDto);
+      String externalId = bookDto.getExternalId();
+      if (checkAvailable(externalId) == true) bookDtos.add(bookDto);
     }
     return bookDtos;
   }
 
-  private Boolean checkAvailable(String externalId)
-  {
-    BookLoan bookLoan=new BookLoan();
-    var bookLoans=bookLoanRepository.findBookLoansByBook_ExternalId(externalId);
-    for(BookLoan bloan:bookLoans)
-    {
-      bookLoan=bloan;
+  private Boolean checkAvailable(String externalId) {
+    BookLoan bookLoan = new BookLoan();
+    var bookLoans = bookLoanRepository.findBookLoansByBook_ExternalId(externalId);
+    for (BookLoan bloan : bookLoans) {
+      bookLoan = bloan;
     }
-    if (bookLoan.getAvailable()==true)
-      return true;
-    else
-      return false;
+    if (bookLoan.getAvailable() == true) return true;
+    else return false;
   }
 
   private BookDto getAuthors(Book book) {
@@ -158,4 +152,27 @@ public class BookService {
     return books;
   }
 
+  public void updateBookByExternalId(BookDto bookDto) {
+    var book =
+        bookRepository
+            .findByExternalId(bookDto.getExternalId())
+            .orElseThrow(
+                () ->
+                    new MicroserviceException(
+                        HttpStatus.NOT_FOUND, "cannot find book by id " + bookDto.getExternalId()));
+    bookRepository.save(bookConverter.toEntity(bookDto, book.getId()));
+  }
+
+  public String deleteBookByExternalId(String externalId) {
+    Book book =
+        bookRepository
+            .findByExternalId(externalId)
+            .orElseThrow(
+                () ->
+                    new MicroserviceException(
+                        HttpStatus.NOT_FOUND, "cannot find book by id " + externalId));
+    bookRepository.deleteBooksFromBooks(externalId);
+    bookRepository.deleteBooksFromLoanBooks(book.getId());
+    return "Book deleted succesfully !";
+  }
 }

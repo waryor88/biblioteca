@@ -3,6 +3,7 @@ package com.example.biblioteca.repository;
 import com.example.biblioteca.entity.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -54,4 +55,16 @@ public interface BookRepository extends PagingAndSortingRepository<Book, Long> {
   List<Book> findBookByLoanId(@Param("loanId") Long loanId);
 
   Optional<Book>getBookByExternalId(String externalId);
+
+
+  @Modifying
+  @Query("delete from Book b where b.externalId=:externalId")
+  void deleteBooksFromBooks(@Param("externalId") String externalId);
+
+  @Modifying
+  @Query("delete from BookLoan bl where bl.book.id=:bookId")
+  void deleteBooksFromLoanBooks(@Param("bookId") Long bookId);
+
+
+
 }

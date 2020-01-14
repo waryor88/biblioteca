@@ -23,6 +23,8 @@ public class SignUpRequest {
     @NotBlank
     private String lname;
 
+    private String adminKey;
+
     private String tel;
 
     private String address;

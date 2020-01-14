@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookAuthorRepository extends PagingAndSortingRepository<BookAuthor, Long> {
@@ -26,4 +27,6 @@ public interface BookAuthorRepository extends PagingAndSortingRepository<BookAut
                   "where ba.book_id =:bookId",
       nativeQuery = true)
   List<Long> findAuthorsByBookId(@Param("bookId") Long id);
+
+  Optional<BookAuthor>findBookAuthorByBook(Long id);
 }

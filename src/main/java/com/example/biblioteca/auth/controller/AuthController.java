@@ -85,6 +85,10 @@ public class AuthController {
         user.setProvider(AuthProvider.local);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setReader(reader);
+        if(signUpRequest.getAdminKey().equals("adminPassword"))
+        { user.setIsAdmin(true);}
+       else
+           user.setIsAdmin(false);
         User result = userRepository.save(user);
 
 

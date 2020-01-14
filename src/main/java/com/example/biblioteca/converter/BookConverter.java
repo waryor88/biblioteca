@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface BookConverter {
 
   BookDto toDto(Book book);
+  Book toEntity(BookDto bookDto,Long id);
+
   Book toEntity(BookDto bookDto);
 
 }

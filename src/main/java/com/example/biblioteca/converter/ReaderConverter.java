@@ -9,8 +9,7 @@ public interface ReaderConverter {
 
   ReaderDto toDto(Reader reader);
   Reader toEntity(ReaderDto readerDto);
-  ReaderRequest toRequest(Reader reader);
-  Reader fromRequest(ReaderRequest readerRequest);
+
 
 
 }

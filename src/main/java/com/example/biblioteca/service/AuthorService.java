@@ -4,6 +4,7 @@ import com.example.biblioteca.converter.AuthorConverter;
 import com.example.biblioteca.converter.BookConverter;
 import com.example.biblioteca.entity.Author;
 import com.example.biblioteca.entity.Book;
+import com.example.biblioteca.entity.BookAuthor;
 import com.example.biblioteca.model.AuthorDto;
 import com.example.biblioteca.model.BookDto;
 import com.example.biblioteca.repository.AuthorRepository;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -52,25 +52,53 @@ public class AuthorService {
   }
 
   public AuthorDto findByExternalId(String externalId) {
-    Author author = authorRepository.findByExternalId(externalId).orElseThrow(
-        () -> new MicroserviceException(HttpStatus.NOT_FOUND,
-            "cannot find author with external id" + externalId));
+    Author author =
+        authorRepository
+            .findByExternalId(externalId)
+            .orElseThrow(
+                () ->
+                    new MicroserviceException(
+                        HttpStatus.NOT_FOUND, "cannot find author with external id" + externalId));
     AuthorDto authorDto = fetchMapping(author);
     return authorDto;
   }
-
 
   private AuthorDto fetchMapping(Author author) {
     final List<BookDto> bookDtos = new ArrayList<>();
     final Iterable<Long> bookIds = bookAuthorRepository.findBookIdByAuthor(author.getId());
     final AuthorDto authorDto = authorConverter.toDto(author);
     for (Long bookId : bookIds) {
-      Book book = bookRepository.findById(bookId)
-          .orElseThrow(() -> new MicroserviceException(HttpStatus.NOT_FOUND, "canno find book"));
+      Book book =
+          bookRepository
+              .findById(bookId)
+              .orElseThrow(
+                  () -> new MicroserviceException(HttpStatus.NOT_FOUND, "canno find book"));
       BookDto bookDto = bookConverter.toDto(book);
       bookDtos.add(bookDto);
       authorDto.setBooks(bookDtos);
     }
     return authorDto;
+  }
+
+  public void assignAuthorToBook(String authorId, String bookId) {
+    Author author =
+        authorRepository
+            .findByExternalId(authorId)
+            .orElseThrow(
+                () ->
+                    new MicroserviceException(
+                        HttpStatus.NOT_FOUND, "cannot find author by id " + authorId));
+
+    Book book =
+        bookRepository
+            .findByExternalId(bookId)
+            .orElseThrow(
+                () ->
+                    new MicroserviceException(
+                        HttpStatus.NOT_FOUND, "cannot find book by id " + bookId));
+    BookAuthor bookAuthor = new BookAuthor();
+    bookAuthor.setBook(book);
+    bookAuthor.setAuthor(author);
+    bookAuthorRepository.save(bookAuthor);
   }
 }
